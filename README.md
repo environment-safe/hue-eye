@@ -17,6 +17,9 @@ you then need to pull in the dependencies (if you aren't building) in your HTML.
     <script type="importmap"> { "imports": {
         "hue-eye": "../node_modules/@environment-safe/hue-eye/src/index.mjs",
         "@environment-safe/elements": "../node_modules/@environment-safe/elements/src/index.mjs",
+        "extended-emitter": "../node_modules/extended-emitter/extended-emitter.mjs",
+        "node:events": "../node_modules/extended-emitter/node-events.mjs",
+        "sift": "/node_modules/sift/es5m/index.js",
         "browser-or-node": "../node_modules/browser-or-node/src/index.js"
     } } </script>
 ```

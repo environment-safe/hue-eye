@@ -59,8 +59,7 @@ class ColorDisc extends _elements.HTMLElement {
     super();
     this.height = parseInt(this.getAttribute('height')) || 300;
     this.width = parseInt(this.getAttribute('width')) || 300;
-    console.log('@', this.height, this.width);
-    this.color = new _color.Color(this.getAttribute('color') || '#000000');
+    this.color = new _color.Color(this.getAttribute('hex') || '#000000');
     this.attachShadow({
       mode: 'open'
     });

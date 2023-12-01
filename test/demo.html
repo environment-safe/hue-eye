@@ -4,12 +4,25 @@
     <title>Hue Eye Demo</title>
     <script type="importmap"> { "imports": {
         "@environment-safe/elements": "../node_modules/@environment-safe/elements/src/index.mjs",
+        "extended-emitter": "../node_modules/extended-emitter/extended-emitter.mjs",
+        "node:events": "../node_modules/extended-emitter/node-events.mjs",
+        "sift": "/node_modules/sift/es5m/index.js",
         "browser-or-node": "../node_modules/browser-or-node/src/index.js"
     } } </script>
     </head>
     <body>
         <script type="module" src="../src/index.mjs"></script>
-        <color-wheel height="300" width="300" hex="#834465"></color-wheel>
+        <color-wheel height="300" width="300" hex="#7d443d" id="wheel"></color-wheel>
         <color-disc height="300" width="300" hex="#00FF77"></color-disc>
+        <script>
+            const wheel = document.getElementById('wheel');
+            try{
+                wheel.addEventListener('change', (event)=>{
+                    alert(event.detail.hex);
+                });
+            }catch(ex){
+                console.log(ex)
+            }
+        </script>
     </body>
 </html>

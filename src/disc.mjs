@@ -57,8 +57,7 @@ export class ColorDisc extends HTMLElement {
         super();
         this.height = parseInt(this.getAttribute('height')) || 300;
         this.width = parseInt(this.getAttribute('width')) || 300;
-        console.log('@', this.height, this.width);
-        this.color = new Color(this.getAttribute('color') || '#000000');
+        this.color = new Color(this.getAttribute('hex') || '#000000');
         this.attachShadow({ mode: 'open' });
         //load the CSS into the shadow DOM
         this._canvas = document.createElement('canvas');

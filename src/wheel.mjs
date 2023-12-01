@@ -14,6 +14,7 @@ const ensureRequire = ()=> (!internalRequire) && (internalRequire = mod.createRe
 
 import { Color } from './color.mjs';
 import { HTMLElement, customElements } from '@environment-safe/elements';
+import { Emitter } from 'extended-emitter';
 
 const xy2polar = (x, y)=>{
     return [
@@ -65,7 +66,7 @@ export class ColorWheel extends HTMLElement {
         super();
         this.height = parseInt(this.getAttribute('height')) || 300;
         this.width = parseInt(this.getAttribute('width')) || 300;
-        this.color = new Color(this.getAttribute('color') || '#000000');
+        this.color = new Color(this.getAttribute('hex') || '#000000');
         this.attachShadow({ mode: 'open' });
         //load the CSS into the shadow DOM
         this._canvas = document.createElement('canvas');
@@ -87,6 +88,11 @@ export class ColorWheel extends HTMLElement {
         this.shadowRoot.appendChild(this._canvas);
         this.shadowRoot.appendChild(this._styles);
         this.shadowRoot.appendChild(this._selector);
+        this.emitter = new Emitter();
+        this.emitter.on('change', (data)=>{
+            const event = new CustomEvent('change', { detail: data });
+            this.dispatchEvent(event);
+        });
         this._canvas.addEventListener('mousedown', (event)=>{
             const x = event.pageX;
             const y = event.pageY;
@@ -96,6 +102,7 @@ export class ColorWheel extends HTMLElement {
             const hex = rgbToHex(r, g, b);
             this.color.set(hex);
             this.setAttribute('hex', hex);
+            this.emitter.emit('change', {hex});
         });
     }
     
@@ -120,38 +127,35 @@ export class ColorWheel extends HTMLElement {
         let yoffset = 0;
         let xoffset = 0;
         let offset = 0;
+        let closestDistance = 10000;
+        let distance = 0;
+        let closest = null;
         for(let y=0; y < this.height; y++){
             yoffset = y  * this.width * 4;
             for(let x=0; x < this.width; x++){
                 xoffset = x * 4;
                 offset = yoffset + xoffset;
-                if(
-                    rgb[0] === pixels.data[offset+0] &&
-                    rgb[1] === pixels.data[offset+1] &&
-                    rgb[2] === pixels.data[offset+2] &&
-                    pixels.data[offset+3] && !match
-                ){
-                    match = { x, y };
+                if(pixels.data[offset+3]){
+                    distance = 
+                        Math.abs(rgb[0] - pixels.data[offset+0]) +
+                        Math.abs(rgb[1] - pixels.data[offset+1]) +
+                        Math.abs(rgb[2] - pixels.data[offset+2]);
+                    if(distance < closestDistance){
+                        closest = { x, y };
+                        closestDistance = distance;
+                    }
+                    if(
+                        rgb[0] === pixels.data[offset+0] &&
+                        rgb[1] === pixels.data[offset+1] &&
+                        rgb[2] === pixels.data[offset+2] &&
+                        !match
+                    ){
+                        match = { x, y };
+                    }
                 }
             }
         }
-        /*for(let lcv=0; lcv < pixels.data.length && !match; lcv+=4){
-            //console.log('1');
-            if(pixels.data[lcv+3]) console.log('@@@', pixels.data.length, rgb, pixels.data.slice(lcv, 4))
-            if(
-                rgb[0] === pixels.data[lcv+0] &&
-                rgb[1] === pixels.data[lcv+1] &&
-                rgb[2] === pixels.data[lcv+2] &&
-                pixels.data[lcv+3]
-            ){
-                console.log('$$', pixels.data.length, rgb, pixels.data.slice(lcv, 4), yoffset, lcv)
-                match = {
-                    y: Math.floor(lcv / yoffset),
-                    x: lcv % yoffset
-                };
-            }
-        }*/
-        return match;
+        return match || closest;
     }
      
     connectedCallback(){
@@ -169,12 +173,16 @@ export class ColorWheel extends HTMLElement {
             throw new Error('dirty index not found');
         }
         this.dirty.splice(dirtyIndex, 1);
-        if(this.dirty.length === 0) this.dirty = null;
+        if(this.dirty.length === 0){
+            this.dirty = null;
+            this.display();
+        }
     }
     
     // We reflect attribute changes into property changes
     attributeChangedCallback(attr, oldVal, newVal){
         if(oldVal !== newVal){
+            if(attr === 'hex') this.color.set(newVal);
             this[attr] = newVal;
             if(!this.dirty){
                 this.dirty = ColorWheel.formats.slice();
@@ -188,6 +196,9 @@ export class ColorWheel extends HTMLElement {
                         }
                     }
                 });
+                const value = {};
+                value[attr] = newVal;
+                //this.emit('change', value);
             }else{
                 this.markClean(attr);
             }
@@ -258,7 +269,6 @@ export class ColorWheel extends HTMLElement {
             this._selector.style.top = location.y+'px';
             this._selector.style.left = location.x+'px';
         }
-        console.log('>>>', location);
     }
  
 }

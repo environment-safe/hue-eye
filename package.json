@@ -61,6 +61,7 @@
             "path"
         ],
         "shims": {
+            "node:events": "node_modules/extended-emitter/node-events.mjs",
             "chai": "node_modules/chai/chai.js",
             "browser-or-node": "node_modules/browser-or-node/src/index.js"
         }
@@ -96,12 +97,13 @@
         "container-test": "docker build . -t environment-safe-package.json -f ./containers/test.dockerfile; docker logs --follow \"$(docker run -d environment-safe-package.json)\"",
         "build-docs": "build-jsdoc docs",
         "build-types": "build-jsdoc types",
-        "demo":"open http://localhost:8000/test/demo.html; npx http-server -p 8000",
+        "demo": "open http://localhost:8000/test/demo.html; npx http-server -p 8000",
         "add-generated-files-to-commit": "git add docs/*.md; git add src/*.d.ts; git add dist/*.cjs",
         "prepare": "husky install"
     },
     "dependencies": {
         "@environment-safe/elements": "^0.0.2",
-        "browser-or-node": "^2.1.1"
+        "browser-or-node": "^2.1.1",
+        "extended-emitter": "^1.6.0"
     }
 }
