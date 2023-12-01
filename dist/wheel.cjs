@@ -88,9 +88,9 @@ class ColorWheel extends _elements.HTMLElement {
     this._selector.setAttribute('class', 'selector');
     this._canvas.setAttribute('height', this.height);
     this._canvas.setAttribute('width', this.width);
+    this.shadowRoot.appendChild(this._selector);
     this.shadowRoot.appendChild(this._canvas);
     this.shadowRoot.appendChild(this._styles);
-    this.shadowRoot.appendChild(this._selector);
     this.emitter = new _extendedEmitter.Emitter();
     this.emitter.on('change', data => {
       const event = new CustomEvent('change', {
@@ -99,11 +99,11 @@ class ColorWheel extends _elements.HTMLElement {
       this.dispatchEvent(event);
     });
     this._canvas.addEventListener('mousedown', event => {
-      const x = event.pageX;
-      const y = event.pageY;
+      const x = event.offsetX;
+      const y = event.offsetY;
       const [r, g, b] = this.pixelAt(x, y);
-      this._selector.style.top = y + 'px';
-      this._selector.style.left = x + 'px';
+      this._selector.style.marginTop = y + 'px';
+      this._selector.style.marginLeft = x + 'px';
       const hex = rgbToHex(r, g, b);
       this.color.set(hex);
       this.setAttribute('hex', hex);
@@ -164,10 +164,9 @@ class ColorWheel extends _elements.HTMLElement {
     return [].concat(ColorWheel.formats);
   }
   markClean(attr) {
+    if (!this.dirty) return;
     const dirtyIndex = this.dirty.indexOf(attr);
-    if (dirtyIndex === -1) {
-      throw new Error('dirty index not found');
-    }
+    if (dirtyIndex === -1) return;
     this.dirty.splice(dirtyIndex, 1);
     if (this.dirty.length === 0) {
       this.dirty = null;
@@ -177,6 +176,7 @@ class ColorWheel extends _elements.HTMLElement {
 
   // We reflect attribute changes into property changes
   attributeChangedCallback(attr, oldVal, newVal) {
+    if (attr === undefined) return;
     if (oldVal !== newVal) {
       if (attr === 'hex') this.color.set(newVal);
       this[attr] = newVal;
@@ -256,8 +256,8 @@ class ColorWheel extends _elements.HTMLElement {
   display() {
     const location = this.pixelWith(this.color.rgb());
     if (location.x && location.y) {
-      this._selector.style.top = location.y + 'px';
-      this._selector.style.left = location.x + 'px';
+      this._selector.style.marginTop = location.y + 'px';
+      this._selector.style.marginLeft = location.x + 'px';
     }
   }
 }
