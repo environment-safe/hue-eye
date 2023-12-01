@@ -11,3 +11,7 @@ const ensureRequire = ()=> (!internalRequire) && (internalRequire = mod.createRe
  * A JSON object
  * @typedef { object } JSON
  */
+ 
+import { ColorWheel } from './wheel.mjs';
+import { ColorDisc } from './disc.mjs';
+export { ColorWheel, ColorDisc };

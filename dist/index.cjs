@@ -1,14 +1,19 @@
-/*
-import { isBrowser, isJsDom } from 'browser-or-node';
-import * as mod from 'module';
-import * as path from 'path';
-let internalRequire = null;
-if(typeof require !== 'undefined') internalRequire = require;
-const ensureRequire = ()=> (!internalRequire) && (internalRequire = mod.createRequire(import.meta.url));
-//*/
-
-/**
- * A JSON object
- * @typedef { object } JSON
- */
 "use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "ColorDisc", {
+  enumerable: true,
+  get: function () {
+    return _disc.ColorDisc;
+  }
+});
+Object.defineProperty(exports, "ColorWheel", {
+  enumerable: true,
+  get: function () {
+    return _wheel.ColorWheel;
+  }
+});
+var _wheel = require("./wheel.cjs");
+var _disc = require("./disc.cjs");
